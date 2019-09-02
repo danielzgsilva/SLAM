@@ -1,5 +1,5 @@
 # SLAM
-Semantic localization and mapping (SLAM), monocular depth prediction and odometry techniques for combat vehicles and LWRI using deep CNNs.
+Semantic localization and mapping (SLAM), monocular depth prediction and odometry techniques for combat vehicles and LWIR using deep CNNs.
 
 Sponsored by UCF's Center for Research in Computer Vision and UCF’s Optics and Photonics Lab (CREOL)
 
