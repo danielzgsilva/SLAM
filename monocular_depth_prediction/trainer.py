@@ -108,15 +108,28 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {"kitti": datasets.KITTIRAWDataset,
-                         "kitti_odom": datasets.KITTIOdomDataset}
+        datasets_dict = {'kitti': datasets.KITTIRAWDataset,
+                         'kitti_odom': datasets.KITTIOdomDataset,
+                         'FLIR': datasets.FlirDataset,
+                         'KAIST': datasets.KAIST_multispectral}
+        
         self.dataset = datasets_dict[self.opt.dataset]
-
-        fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
-
-        train_filenames = readlines(fpath.format("train"))
-        val_filenames = readlines(fpath.format("val"))
-        img_ext = '.png' if self.opt.png else '.jpg'
+        
+        if self.opt.dataset == 'FLIR':
+            train_filenames = os.listdir(os.path.join(self.data_path, 'train'))
+            train_filenames.sort()
+            train_filenames = train_filenames[1:-1]
+            val_filenames = os.listdir(os.path.join(self.data_path, "valid"))
+            val_filenames.sort()
+            val_filenames = val_filenames[1:-1]
+        else:
+            fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
+            train_filenames = readlines(fpath.format("train"))
+            val_filenames = readlines(fpath.format("val"))
+            
+        assert (self.opt.img_ext == '.png') or (self.opt.img_ext == '.jpg') or (self.opt.img_ext == '.jpeg'), "Please provide a correct image extension"
+        
+        img_ext = self.opt.img_ext
 
         num_train_samples = len(train_filenames)
         self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs

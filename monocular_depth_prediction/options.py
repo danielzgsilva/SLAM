@@ -45,10 +45,11 @@ class MonodepthOptions:
                                  type=str,
                                  help="dataset to train on",
                                  default="kitti",
-                                 choices=["kitti", "kitti_odom", "kitti_depth", "kitti_test"])
-        self.parser.add_argument("--png",
-                                 help="if set, trains from raw KITTI png files (instead of jpgs)",
-                                 action="store_true")
+                                 choices=["kitti", "kitti_odom", "kitti_depth", "kitti_test", 'FLIR', 'KAIST'])
+        self.parser.add_argument("--img_ext",
+                                 help="image extension to anticipate",
+                                 type=str,
+                                 default='.jpg')
         self.parser.add_argument("--height",
                                  type=int,
                                  help="input image height",
@@ -93,7 +94,6 @@ class MonodepthOptions:
                                  help="learning rate",
                                  default=1e-4)
         self.parser.add_argument("--num_epochs",
-                                 type=int,
                                  help="number of epochs",
                                  default=20)
         self.parser.add_argument("--scheduler_step_size",

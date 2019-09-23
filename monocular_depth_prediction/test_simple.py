@@ -165,11 +165,12 @@ def test_simple(args):
         for file in os.listdir(args.image_path):
             if not file.endswith('.{}'.format(args.ext)):
                     continue
-            orig_imgs.append(cv2.imread(os.path.join(args.image_path, file)))
+            temp = cv2.imread(os.path.join(args.image_path, file))
+            orig_imgs.append(temp)
 
         height, width = orig_imgs[0].shape[0:2]
 
-        orig_video = cv2.VideoWriter(os.path.join(video_directory,'orig_video.avi'), cv2.VideoWriter_fourcc('M','J','P','G'), 15,(width,height))
+        orig_video = cv2.VideoWriter(os.path.join(video_directory,'orig_video.avi'), cv2.VideoWriter_fourcc('M','J','P','G'), 10,(width,height))
 
         for image in orig_imgs:
             orig_video.write(image)
@@ -183,11 +184,12 @@ def test_simple(args):
         for file in os.listdir(output_directory):
             if file.endswith("_disp.npy"):
                     continue
-            depth_imgs.append(cv2.imread(os.path.join(output_directory, file)))
+            temp_depth = cv2.imread(os.path.join(output_directory, file))
+            depth_imgs.append(temp_depth)
 
         height, width = depth_imgs[0].shape[0:2]
 
-        depth_video = cv2.VideoWriter(os.path.join(video_directory,'depth_video.avi'), cv2.VideoWriter_fourcc('M','J','P','G'), 15,(width,height))
+        depth_video = cv2.VideoWriter(os.path.join(video_directory,'depth_video.avi'), cv2.VideoWriter_fourcc('M','J','P','G'), 10,(width,height))
 
         for image in depth_imgs:
             depth_video.write(image)
