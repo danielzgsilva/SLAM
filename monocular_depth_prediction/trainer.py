@@ -530,7 +530,7 @@ class Trainer:
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             total_loss += loss
-            losses["loss/{}".format(scale)] = loss
+            losses["loss @ scale: {}".format(scale)] = loss
 
         total_loss /= self.num_scales
         losses["loss"] = total_loss
