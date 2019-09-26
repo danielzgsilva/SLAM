@@ -120,16 +120,16 @@ class Trainer:
         thermal = False
         if self.opt.dataset == 'FLIR':
             train_filenames = []
-            train_filenames.extend(os.path.join(data_path, 'train/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(data_path, 'train/PreviewData/'))[1:-1])
-            train_filenames.extend(os.path.join(data_path, 'video/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(data_path, 'video/PreviewData/'))[1:-1])
+            train_filenames.extend(os.path.join(self.opt.data_path, 'train/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'train/PreviewData/'))[1:-1])
+            train_filenames.extend(os.path.join(self.opt.data_path, 'video/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'video/PreviewData/'))[1:-1])
             val_filenames = []
-            val_filenames.extend(os.path.join(data_path, 'valid/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(data_path, 'valid/PreviewData/'))[1:-1])
+            val_filenames.extend(os.path.join(self.opt.data_path, 'valid/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'valid/PreviewData/'))[1:-1])
             thermal = True 
         elif self.opt.dataset == 'KAIST':
-            train_files = os.path.join(data_path, 'training')
+            train_files = os.path.join(self.opt.data_path, 'training')
             train_filenames = []
 
             train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') + 
@@ -139,7 +139,7 @@ class Trainer:
             train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
                                    file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))[1:-1])
             
-            val_files = os.path.join(data_path, 'testing')
+            val_files = os.path.join(self.opt.data_path, 'testing')
             val_filenames = []
 
             val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
