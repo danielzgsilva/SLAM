@@ -10,7 +10,8 @@ import os
 import random
 import numpy as np
 import copy
-from PIL import Image  # using pillow-simd for increased speed
+import re
+from PIL import Image as pil
 
 import torch
 import torch.utils.data as data
@@ -21,7 +22,7 @@ def pil_loader(path):
     # open path as file to avoid ResourceWarning
     # (https://github.com/python-pillow/Pillow/issues/835)
     with open(path, 'rb') as f:
-        with Image.open(f) as img:
+        with pil.open(f) as img:
             return img.convert('RGB')
 
 
@@ -37,6 +38,7 @@ class MonoDataset(data.Dataset):
         num_scales
         is_train
         img_ext
+        thermal - differentiates between kitti and thermal datasets, needed for file reading
     """
     def __init__(self,
                  data_path,
@@ -46,7 +48,8 @@ class MonoDataset(data.Dataset):
                  frame_idxs,
                  num_scales,
                  is_train=False,
-                 img_ext='.jpg'):
+                 img_ext='.jpg',
+                 thermal = False):
         super(MonoDataset, self).__init__()
 
         self.data_path = data_path
@@ -54,12 +57,14 @@ class MonoDataset(data.Dataset):
         self.height = height
         self.width = width
         self.num_scales = num_scales
-        self.interp = Image.ANTIALIAS
+        self.interp = pil.ANTIALIAS
 
         self.frame_idxs = frame_idxs
 
         self.is_train = is_train
         self.img_ext = img_ext
+        
+        self.thermal = thermal
 
         self.loader = pil_loader
         self.to_tensor = transforms.ToTensor()
@@ -137,28 +142,40 @@ class MonoDataset(data.Dataset):
         """
         inputs = {}
 
-        do_color_aug = self.is_train and random.random() > 0.5
+        do_color_aug = self.is_train and random.random() > 0.5 and not self.thermal
         do_flip = self.is_train and random.random() > 0.5
+        
+        if not self.thermal:
+            # load kitti data from split files
+            line = self.filenames[index].split()
+            folder = line[0]
 
-        line = self.filenames[index].split()
-        folder = line[0]
-
-        if len(line) == 3:
-            frame_index = int(line[1])
-        else:
-            frame_index = 0
-
-        if len(line) == 3:
-            side = line[2]
-        else:
-            side = None
-
-        for i in self.frame_idxs:
-            if i == "s":
-                other_side = {"r": "l", "l": "r"}[side]
-                inputs[("color", i, -1)] = self.get_color(folder, frame_index, other_side, do_flip)
+            if len(line) == 3:
+                frame_index = int(line[1])
             else:
-                inputs[("color", i, -1)] = self.get_color(folder, frame_index + i, side, do_flip)
+                frame_index = 0
+
+            if len(line) == 3:
+                side = line[2]
+            else:
+                side = None
+
+            for i in self.frame_idxs:
+                if i == "s":
+                    other_side = {"r": "l", "l": "r"}[side]
+                    inputs[("color", i, -1)] = self.get_color(folder, frame_index, other_side, do_flip)
+                else:
+                    inputs[("color", i, -1)] = self.get_color(folder, frame_index + i, side, do_flip)
+        else:
+            # load images from thermal datasets
+            line = self.filenames[index]
+            frame_index = int(re.findall(r'\d+', line)[-1])
+
+            for i in self.frame_idxs:
+                try:
+                    inputs[("color", i, -1)] = self.get_color(frame_index + i, do_flip, line)
+                except:
+                    continue
 
         # adjusting intrinsics to match each scale in the pyramid
         for scale in range(self.num_scales):

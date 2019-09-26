@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 #from tensorboardX import SummaryWriter
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 
 import json
 
@@ -112,17 +112,42 @@ class Trainer:
         datasets_dict = {'kitti': datasets.KITTIRAWDataset,
                          'kitti_odom': datasets.KITTIOdomDataset,
                          'FLIR': datasets.FlirDataset,
-                         'KAIST': datasets.KAIST_multispectral}
+                         'KAIST': datasets.KAIST_Dataset}
         
         self.dataset = datasets_dict[self.opt.dataset]
         
+        thermal = False
         if self.opt.dataset == 'FLIR':
-            train_filenames = os.listdir(os.path.join(self.data_path, 'train'))
-            train_filenames.sort()
-            train_filenames = train_filenames[1:-1]
-            val_filenames = os.listdir(os.path.join(self.data_path, "valid"))
-            val_filenames.sort()
-            val_filenames = val_filenames[1:-1]
+            train_filenames = []
+            train_filenames.extend(os.path.join(data_path, 'train/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(data_path, 'train/PreviewData/'))[1:-1])
+            train_filenames.extend(os.path.join(data_path, 'video/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(data_path, 'video/PreviewData/'))[1:-1])
+            val_filenames = []
+            val_filenames.extend(os.path.join(data_path, 'valid/PreviewData/') + 
+                                   file for file in os.listdir(os.path.join(data_path, 'valid/PreviewData/'))[1:-1])
+            thermal = True 
+        elif self.opt.dataset == 'KAIST':
+            train_files = os.path.join(data_path, 'training')
+            train_filenames = []
+
+            train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))[1:-1])
+            train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))[1:-1])
+            train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))[1:-1])
+            
+            val_files = os.path.join(data_path, 'testing')
+            val_filenames = []
+
+            val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))[1:-1])
+            val_filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))[1:-1])
+            val_filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') + 
+                                   file for file in os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))[1:-1])    
+            thermal = True
         else:
             fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
             train_filenames = readlines(fpath.format("train"))
@@ -137,21 +162,21 @@ class Trainer:
 
         train_dataset = self.dataset(
             self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
-            self.opt.frame_ids, 4, is_train=True, img_ext=img_ext)
+            self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, thermal=thermal)
         self.train_loader = DataLoader(
             train_dataset, self.opt.batch_size, True,
             num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
         val_dataset = self.dataset(
             self.opt.data_path, val_filenames, self.opt.height, self.opt.width,
-            self.opt.frame_ids, 4, is_train=False, img_ext=img_ext)
+            self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, thermal = thermal)
         self.val_loader = DataLoader(
             val_dataset, self.opt.batch_size, True,
             num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
         self.val_iter = iter(self.val_loader)
 
-        self.writers = {}
-        for mode in ["train", "val"]:
-            self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+       # self.writers = {}
+       # for mode in ["train", "val"]:
+       #     self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
         if not self.opt.no_ssim:
             self.ssim = SSIM()
@@ -344,7 +369,7 @@ class Trainer:
             if "depth_gt" in inputs:
                 self.compute_depth_losses(inputs, outputs, losses)
 
-            self.log("val", inputs, outputs, losses)
+            self.log_no_tensorboard("val", inputs, outputs, losses)
             del inputs, outputs, losses
 
         self.set_train()
@@ -546,8 +571,12 @@ class Trainer:
             " | loss: {:.5f} | time elapsed: {} | time left: {}"
         print(print_string.format(self.epoch, batch_idx, samples_per_sec, loss,
                                   sec_to_hm_str(time_sofar), sec_to_hm_str(training_time_left)))
-
-    def log(self, mode, inputs, outputs, losses):
+    
+    def log_no_tensorboard(self, mode, losses):
+        for l, v in losses.items():
+            print('{} step: {} | {}: {})'.format(mode, self.step, l , v))
+       
+    '''def log(self, mode, inputs, outputs, losses):
         """Write an event to the tensorboard events file
         """
         writer = self.writers[mode]
@@ -579,7 +608,7 @@ class Trainer:
                 elif not self.opt.disable_automasking:
                     writer.add_image(
                         "automask_{}/{}".format(s, j),
-                        outputs["identity_selection/{}".format(s)][j][None, ...], self.step)
+                        outputs["identity_selection/{}".format(s)][j][None, ...], self.step)'''
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
