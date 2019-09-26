@@ -198,7 +198,11 @@ class Trainer:
         self.depth_metric_names = [
             "de/abs_rel", "de/sq_rel", "de/rms", "de/log_rms", "da/a1", "da/a2", "da/a3"]
 
-        print("Using split:\n  ", self.opt.split)
+        if self.opt.dataset.startswith('kitti')
+            print("Using split:\n  ", self.opt.split)
+        else:
+            print("Using dataset:\n  ", self.opt.dataset)
+        
         print("There are {:d} training items and {:d} validation items\n".format(
             len(train_dataset), len(val_dataset)))
 
