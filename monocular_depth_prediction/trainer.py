@@ -24,7 +24,6 @@ from layers import *
 
 import datasets
 import networks
-from IPython import embed
 
 
 class Trainer:
