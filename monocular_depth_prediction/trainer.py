@@ -22,7 +22,7 @@ from utils import *
 from kitti_utils import *
 from layers import *
 
-import datasets
+from datasets import *
 import networks
 
 
@@ -108,10 +108,10 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {'kitti': datasets.kitti_dataset.KITTIRAWDataset,
-                         'kitti_odom': datasets.kitti_dataset.KITTIOdomDataset,
-                         'FLIR': datasets.flir_dataset.FlirDataset,
-                         'KAIST': datasets.kaist_dataset.KAIST_Dataset}
+        datasets_dict = {'kitti': kitti_dataset.KITTIRAWDataset,
+                         'kitti_odom': kitti_dataset.KITTIOdomDataset,
+                         'FLIR': flir_dataset.FlirDataset,
+                         'KAIST': kaist_dataset.KAIST_Dataset}
         
         self.dataset = datasets_dict[self.opt.dataset]
         
