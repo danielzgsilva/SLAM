@@ -198,7 +198,7 @@ class Trainer:
         self.depth_metric_names = [
             "de/abs_rel", "de/sq_rel", "de/rms", "de/log_rms", "da/a1", "da/a2", "da/a3"]
 
-        if self.opt.dataset.startswith('kitti')
+        if self.opt.dataset.startswith('kitti'):
             print("Using split:\n  ", self.opt.split)
         else:
             print("Using dataset:\n  ", self.opt.dataset)
