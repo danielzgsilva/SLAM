@@ -22,7 +22,9 @@ from utils import *
 from kitti_utils import *
 from layers import *
 
-from datasets import *
+from datasets.kitti_dataset import *
+from datasets.flir_dataset import FlirDataset
+from datasets.kaist_dataset import KAIST_Dataset
 import networks
 
 
