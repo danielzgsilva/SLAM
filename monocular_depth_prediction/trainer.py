@@ -108,10 +108,10 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {'kitti': datasets.KITTIRAWDataset,
-                         'kitti_odom': datasets.KITTIOdomDataset,
-                         'FLIR': datasets.FlirDataset,
-                         'KAIST': datasets.KAIST_Dataset}
+        datasets_dict = {'kitti': datasets.kitti_dataset.KITTIRAWDataset,
+                         'kitti_odom': datasets.kitti_dataset.KITTIOdomDataset,
+                         'FLIR': datasets.flir_dataset.FlirDataset,
+                         'KAIST': datasets.kaist_dataset.KAIST_Dataset}
         
         self.dataset = datasets_dict[self.opt.dataset]
         
