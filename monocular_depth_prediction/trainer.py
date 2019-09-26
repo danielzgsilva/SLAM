@@ -257,7 +257,8 @@ class Trainer:
                 if "depth_gt" in inputs:
                     self.compute_depth_losses(inputs, outputs, losses)
 
-                self.log("train", inputs, outputs, losses)
+                #self.log("train", inputs, outputs, losses)
+                self.log_no_tensorboard("train", losses)
                 self.val()
 
             self.step += 1
@@ -370,7 +371,7 @@ class Trainer:
             if "depth_gt" in inputs:
                 self.compute_depth_losses(inputs, outputs, losses)
 
-            self.log_no_tensorboard("val", inputs, outputs, losses)
+            self.log_no_tensorboard("val", losses)
             del inputs, outputs, losses
 
         self.set_train()
