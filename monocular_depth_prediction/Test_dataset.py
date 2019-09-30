@@ -302,21 +302,21 @@ if __name__ == "__main__":
         train_filenames = []
 
         train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))[1:-1])
+                               file for file in os.listdir(os.path.join(train_files, 'Campus/THERMAL/')).sort()[1:-1])
         train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))[1:-1])
+                               file for file in os.listdir(os.path.join(train_files, 'Residential/THERMAL/')).sort()[1:-1])
         train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))[1:-1])
+                               file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/')).sort()[1:-1])
 
         val_files = os.path.join(data_path, 'testing')
         val_filenames = []
 
         val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))[1:-1])
+                               file for file in os.listdir(os.path.join(val_files, 'Campus/THERMAL/')).sort()[1:-1])
         val_filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))[1:-1])
+                               file for file in os.listdir(os.path.join(val_files, 'Residential/THERMAL/')).sort()[1:-1])
         val_filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))[1:-1])    
+                               file for file in os.listdir(os.path.join(val_files, 'Urban/THERMAL/')).sort()[1:-1])
         thermal = True
     else:
         print('wrong dataset')
@@ -337,7 +337,7 @@ if __name__ == "__main__":
         print("Using dataset:\n  ", data_set)
         
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
-    
+
     for file in train_filenames:
         print(file)
     
