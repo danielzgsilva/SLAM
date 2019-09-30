@@ -23,7 +23,6 @@ def pil_loader(path):
     # (https://github.com/python-pillow/Pillow/issues/835)
     with open(path, 'rb') as f:
         with pil.open(f) as img:
-            print('using loader')
             return img.convert('RGB')
 
 

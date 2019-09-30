@@ -21,12 +21,8 @@ class KAIST_Dataset(MonoDataset):
 
     def get_color(self, frame_index, do_flip, line):
         color = self.loader(self.get_image_path(frame_index, line))
-        print('getting color')
         if do_flip:
-            print('flipping')
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
-            print('flipped!')
-        print('after flip')
         return color
 
     def get_image_path(self, frame_index, line):
