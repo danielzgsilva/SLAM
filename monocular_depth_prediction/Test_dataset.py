@@ -1,7 +1,7 @@
+from __future__ import absolute_import, division, print_function
 import os
 from torch.utils.data import DataLoader
 import PIL.Image as pil
-from __future__ import absolute_import, division, print_function
 
 import os
 import random
@@ -305,10 +305,10 @@ if __name__ == "__main__":
     num_total_steps = num_train_samples // 12 * 20
 
     train_dataset = dataset(data_path, train_filenames, 448, 512, [0, -1, 1], 4, is_train = True, img_ext=img_ext, thermal = thermal)
-    train_loader = DataLoader(train_dataset, 12, True, num_workers=12, pin_memory=True, drop_last=True)
+    train_loader = DataLoader(train_dataset, 12, False, num_workers=12, pin_memory=True, drop_last=True)
     
     val_dataset = dataset(data_path, val_filenames, 448, 512, [0, -1, 1], 4, is_train = False, img_ext=img_ext, thermal = thermal)
-    val_loader = DataLoader(val_dataset, 12, True, num_workers=12, pin_memory=True, drop_last=True)
+    val_loader = DataLoader(val_dataset, 12, False, num_workers=12, pin_memory=True, drop_last=True)
     val_iter = iter(val_loader)
     
     if data_set.startswith('kitti'):
