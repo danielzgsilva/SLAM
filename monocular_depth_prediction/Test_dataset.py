@@ -8,6 +8,7 @@ import random
 import numpy as np
 import copy
 import re
+import sys
 
 import torch
 import torch.utils.data as data
@@ -250,7 +251,7 @@ class FlirDataset(MonoDataset):
             image_path = os.path.join(path, "FLIR_{}".format(f_str))
         else:
             image_path = os.path.join(path, "FLIR_video_{}".format(f_str))
-        print(image_path)
+        sys.stderr.write(image_path)
         return image_path
 
 class KAIST_Dataset(MonoDataset):
@@ -279,7 +280,7 @@ class KAIST_Dataset(MonoDataset):
         path = line.split('/')[:-1]
         path = '/'.join(path)
         image_path = os.path.join(path, "THER_{}".format(f_str))
-        print(image_path)
+        sys.stderr.write(image_path)
         return image_path
 
     def check_depth(self):
