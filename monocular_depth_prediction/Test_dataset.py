@@ -50,10 +50,10 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, 12, True, num_workers=12, pin_memory=True, drop_last=True)
     val_iter = iter(val_loader)
     
-    if dataset.startswith('kitti'):
+    if data_set.startswith('kitti'):
         print("Using kitti")
     else:
-        print("Using dataset:\n  ", dataset)
+        print("Using dataset:\n  ", data_set)
         
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
     
