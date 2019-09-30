@@ -175,8 +175,9 @@ class MonoDataset(data.Dataset):
             for i in self.frame_idxs:
                 try:
                     inputs[("color", i, -1)] = self.get_color(frame_index + i, do_flip, line)
-                except:
-                    continue
+                except Exception as e:
+                    print(e)
+                    
 
         # adjusting intrinsics to match each scale in the pyramid
         for scale in range(self.num_scales):
