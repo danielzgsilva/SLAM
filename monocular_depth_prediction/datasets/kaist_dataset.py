@@ -17,6 +17,7 @@ class KAIST_Dataset(MonoDataset):
         self.full_res_shape = (1242, 375)
         self.side_map = {"2": 2, "3": 3, "l": 2, "r": 3}
         self.img_ext = '.jpg'
+        self.loader = pil_loader
 
     def get_color(self, frame_index, do_flip, line):
         color = self.loader(self.get_image_path(frame_index, line))

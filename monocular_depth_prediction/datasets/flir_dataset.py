@@ -17,6 +17,7 @@ class FlirDataset(MonoDataset):
         self.full_res_shape = (1242, 375)
         self.side_map = {"2": 2, "3": 3, "l": 2, "r": 3}
         self.img_ext = '.jpeg'
+        self.loader = pil_loader
 
     def check_depth(self):
         # FLIR dataset has no ground truth depth
