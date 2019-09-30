@@ -8,7 +8,7 @@ if __name__ == "__main__":
     
     data_path = '/groups/mshah/data/KAIST_multispectral/'
     data_set = 'KAIST'
-    img_ext = '.jpg
+    img_ext = '.jpg'
     
     datasets_dict = {'kitti': KITTIRAWDataset,
                      'kitti_odom': KITTIOdomDataset,
