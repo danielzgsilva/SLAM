@@ -301,22 +301,36 @@ if __name__ == "__main__":
         train_files = os.path.join(data_path, 'training')
         train_filenames = []
 
+        campus_train = os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))
+        campus_train.sort()
+        residential_train = os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))
+        residential_train.sort()
+        urban_train = os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))
+        urban_train.sort()
+
         train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Campus/THERMAL/')).sort()[1:-1])
+                               file for file in campus_train[1:-1])
         train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Residential/THERMAL/')).sort()[1:-1])
+                               file for file in residential_train[1:-1])
         train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/')).sort()[1:-1])
+                               file for file in urban_train[1:-1])
 
         val_files = os.path.join(data_path, 'testing')
         val_filenames = []
 
+        campus_val = os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))
+        campus_val.sort()
+        residential_val = os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))
+        residential_val.sort()
+        urban_val = os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))
+        urban_val.sort()
+
         val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Campus/THERMAL/')).sort()[1:-1])
+                               file for file in campus_val[1:-1])
         val_filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Residential/THERMAL/')).sort()[1:-1])
+                               file for file in residential_val[1:-1])
         val_filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') + 
-                               file for file in os.listdir(os.path.join(val_files, 'Urban/THERMAL/')).sort()[1:-1])
+                               file for file in urban_val[1:-1])
         thermal = True
     else:
         print('wrong dataset')
