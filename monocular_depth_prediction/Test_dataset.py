@@ -337,7 +337,9 @@ if __name__ == "__main__":
         print("Using dataset:\n  ", data_set)
         
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
-    print('train_filenames')
+    
+    for file in train_filenames:
+        print(file)
     
     for batch_idx, inputs in enumerate(train_loader):
             print(batch_idx)
