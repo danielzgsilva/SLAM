@@ -120,34 +120,57 @@ class Trainer:
         thermal = False
         if self.opt.dataset == 'FLIR':
             train_filenames = []
+
+            train_files = os.listdir(os.path.join(self.opt.data_path, 'train/PreviewData/'))
+            train_files.sort()
             train_filenames.extend(os.path.join(self.opt.data_path, 'train/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'train/PreviewData/'))[1:-1])
+                                   file for file in train_files[1:-1])
+
+            video_files = os.listdir(os.path.join(self.opt.data_path, 'video/PreviewData/'))
+            video_files.sort()
             train_filenames.extend(os.path.join(self.opt.data_path, 'video/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'video/PreviewData/'))[1:-1])
+                                   file for file in video_files[1:-1])
+
             val_filenames = []
+            val_files = os.listdir(os.path.join(self.opt.data_path, 'valid/PreviewData/'))
+            val_files.sort()
             val_filenames.extend(os.path.join(self.opt.data_path, 'valid/PreviewData/') + 
-                                   file for file in os.listdir(os.path.join(self.opt.data_path, 'valid/PreviewData/'))[1:-1])
+                                   file for file in val_files[1:-1])
             thermal = True 
         elif self.opt.dataset == 'KAIST':
             train_files = os.path.join(self.opt.data_path, 'training')
             train_filenames = []
 
-            train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))[1:-1])
-            train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))[1:-1])
+            campus_train = os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))
+            campus_train.sort()
+            residential_train = os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))
+            residential_train.sort()
+            urban_train = os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))
+            urban_train.sort()
+
+            train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') +
+                                   file for file in campus_train[1:-1])
+            train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') +
+                                   file for file in residential_train[1:-1])
             train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))[1:-1])
+                                   file for file in urban_train[1:-1])
             
             val_files = os.path.join(self.opt.data_path, 'testing')
             val_filenames = []
 
+            campus_val = os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))
+            campus_val.sort()
+            residential_val = os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))
+            residential_val.sort()
+            urban_val = os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))
+            urban_val.sort()
+
             val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))[1:-1])
+                                   file for file in campus_val[1:-1])
             val_filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))[1:-1])
+                                   file for file in residential_val[1:-1])
             val_filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') + 
-                                   file for file in os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))[1:-1])    
+                                   file for file in urban_val[1:-1])
             thermal = True
         else:
             fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
