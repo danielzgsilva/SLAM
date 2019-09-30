@@ -53,12 +53,11 @@ if __name__ == "__main__":
     val_iter = iter(val_loader)
     
     if dataset.startswith('kitti'):
-            print("Using kitti")
-        else:
-            print("Using dataset:\n  ", dataset)
+        print("Using kitti")
+    else:
+        print("Using dataset:\n  ", dataset)
         
-    print("There are {:d} training items and {:d} validation items\n".format(
-        len(train_dataset), len(val_dataset)))
+    print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
     
     for batch_idx, inputs in enumerate(train_loader):
             print(batch_idx)
