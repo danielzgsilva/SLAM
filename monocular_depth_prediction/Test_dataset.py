@@ -10,9 +10,7 @@ if __name__ == "__main__":
     data_set = 'KAIST'
     img_ext = '.jpg'
     
-    datasets_dict = {'kitti': KITTIRAWDataset,
-                     'kitti_odom': KITTIOdomDataset,
-                     'FLIR': FlirDataset,
+    datasets_dict = {'FLIR': FlirDataset,
                      'KAIST': KAIST_Dataset}
         
     dataset = datasets_dict[data_set]
