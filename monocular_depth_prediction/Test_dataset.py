@@ -327,10 +327,10 @@ if __name__ == "__main__":
     num_total_steps = num_train_samples // 12 * 20
 
     train_dataset = dataset(data_path, train_filenames, 448, 512, [0, -1, 1], 4, is_train = True, img_ext=img_ext, thermal = thermal)
-    train_loader = DataLoader(train_dataset, 12, False, num_workers=12, pin_memory=True, drop_last=True)
+    train_loader = DataLoader(train_dataset, 1, False, num_workers=0, pin_memory=True, drop_last=True)
     
     val_dataset = dataset(data_path, val_filenames, 448, 512, [0, -1, 1], 4, is_train = False, img_ext=img_ext, thermal = thermal)
-    val_loader = DataLoader(val_dataset, 12, False, num_workers=12, pin_memory=True, drop_last=True)
+    val_loader = DataLoader(val_dataset, 1, False, num_workers=0, pin_memory=True, drop_last=True)
     val_iter = iter(val_loader)
     
     if data_set.startswith('kitti'):
@@ -341,8 +341,13 @@ if __name__ == "__main__":
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
     
     for batch_idx, inputs in enumerate(train_loader):
+            print(batch_idx)
             print(inputs.keys())
+            print('\n')
             print(inputs[("path", -1, -1)])
+            print('\n')
             print(inputs[("path", -0, -1)])
+            print('\n')
             print(inputs[("path", 1, -1)])
+            print('\n')
     
