@@ -268,9 +268,7 @@ class KAIST_Dataset(MonoDataset):
         path = self.get_image_path(frame_index, line)
         color = self.loader(path)
         if do_flip:
-            print('need flip')
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
-            print('flipped!!')
         return color, path
 
     def get_image_path(self, frame_index, line):
@@ -339,6 +337,7 @@ if __name__ == "__main__":
         print("Using dataset:\n  ", data_set)
         
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
+    print('train_filenames')
     
     for batch_idx, inputs in enumerate(train_loader):
             print(batch_idx)
