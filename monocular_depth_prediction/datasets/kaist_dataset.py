@@ -3,7 +3,7 @@ import numpy as np
 import PIL.Image as pil
 from torch.utils.data import DataLoader
 
-from datasets.mono_dataset import *
+from datasets.mono_dataset import pil_loader, MonoDataset
 
 class KAIST_Dataset(MonoDataset):
     def __init__(self, *args, **kwargs):
@@ -20,10 +20,12 @@ class KAIST_Dataset(MonoDataset):
 
     def get_color(self, frame_index, do_flip, line):
         color = self.loader(self.get_image_path(frame_index, line))
-
+        print('getting color')
         if do_flip:
+            print('flipping)
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
-
+            print('flipped!')
+        print('after flip')
         return color
 
     def get_image_path(self, frame_index, line):
