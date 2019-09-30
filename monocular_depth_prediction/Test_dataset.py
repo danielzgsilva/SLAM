@@ -171,7 +171,8 @@ class MonoDataset(data.Dataset):
 
             for i in self.frame_idxs:
                 try:
-                    inputs[("color", i, -1)] = self.get_color(frame_index + i, do_flip, line)
+                    inputs[("color", i, -1)], path = self.get_color(frame_index + i, do_flip, line)
+                    inputs[("path", i, -1)] = path
                 except Exception as e:
                     print(e)
 
@@ -196,8 +197,8 @@ class MonoDataset(data.Dataset):
         self.preprocess(inputs, color_aug)
 
         for i in self.frame_idxs:
-            del inputs[("color", i, -1)]
-            del inputs[("color_aug", i, -1)]
+    #        del inputs[("color", i, -1)]
+     #       del inputs[("color_aug", i, -1)]
 
         if self.load_depth:
             depth_gt = self.get_depth(folder, frame_index, side, do_flip)
@@ -235,12 +236,13 @@ class FlirDataset(MonoDataset):
         return False
 
     def get_color(self, frame_index, do_flip, line):
-        color = self.loader(self.get_image_path(frame_index, line))
+        path = self.get_image_path(frame_index, line)
+        color = self.loader(path)
 
         if do_flip:
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
 
-        return color
+        return color, path
 
     def get_image_path(self, frame_index, line):
         f_str = "{:05d}{}".format(frame_index, self.img_ext)
@@ -268,12 +270,13 @@ class KAIST_Dataset(MonoDataset):
         self.img_ext = '.jpg'
 
     def get_color(self, frame_index, do_flip, line):
-        color = self.loader(self.get_image_path(frame_index, line))
+        path = self.get_image_path(frame_index, line)
+        color = self.loader(path)
         if do_flip:
             print('need flip')
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
             print('flipped!!')
-        return color
+        return color, path
 
     def get_image_path(self, frame_index, line):
         f_str = "{:09d}{}".format(frame_index, self.img_ext)
@@ -288,22 +291,6 @@ class KAIST_Dataset(MonoDataset):
 
         return False
 
-    def get_depth(self, folder, frame_index, side, do_flip):
-        calib_path = os.path.join(self.data_path, folder.split("/")[0])
-
-        velo_filename = os.path.join(
-            self.data_path,
-            folder,
-            "velodyne_points/data/{:010d}.bin".format(int(frame_index)))
-
-        depth_gt = generate_depth_map(calib_path, velo_filename, self.side_map[side])
-        depth_gt = skimage.transform.resize(
-            depth_gt, self.full_res_shape[::-1], order=0, preserve_range=True, mode='constant')
-
-        if do_flip:
-            depth_gt = np.fliplr(depth_gt)
-
-        return depth_gt
 
 if __name__ == "__main__":
     
@@ -359,5 +346,8 @@ if __name__ == "__main__":
     print("There are {:d} training items and {:d} validation items\n".format(len(train_dataset), len(val_dataset)))
     
     for batch_idx, inputs in enumerate(train_loader):
-            print(batch_idx)
+            print(inputs.keys())
+            print(inputs[("path", -1, -1)])
+            print(inputs[("path", -0, -1)])
+            print(inputs[("path", 1, -1)])
     
