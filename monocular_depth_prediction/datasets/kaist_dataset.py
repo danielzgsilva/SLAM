@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import PIL.Image as pil
-from torch.utils.data import DataLoader
 
 from datasets.mono_dataset import pil_loader, MonoDataset
 
@@ -30,7 +29,6 @@ class KAIST_Dataset(MonoDataset):
         path = line.split('/')[:-1]
         path = '/'.join(path)
         image_path = os.path.join(path, "THER_{}".format(f_str))
-        print(image_path)
         return image_path
     
     def check_depth(self):

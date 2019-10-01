@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import PIL.Image as pil
-from torch.utils.data import DataLoader
 
 from datasets.mono_dataset import *
 
@@ -41,5 +40,4 @@ class FlirDataset(MonoDataset):
             image_path = os.path.join(path, "FLIR_{}".format(f_str))
         else:
             image_path = os.path.join(path, "FLIR_video_{}".format(f_str))
-        print(image_path)
         return image_path
