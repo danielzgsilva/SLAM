@@ -212,8 +212,9 @@ def evaluate(opt):
         gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1')["data"]
     else:
         gt_depths = np.stack([loadmat(path)['depth'] for path in gt_files])
+        print('thermal depths')
 
-    print("-> Evaluating")
+    print("-> Evaluating on {} images".format(len(filenames)))
 
     if opt.eval_stereo:
         print("   Stereo evaluation - "
