@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import cv2
 import numpy as np
+from scipy.io import loadmat
 
 import torch
 from torch.utils.data import DataLoader
@@ -10,7 +11,8 @@ from torch.utils.data import DataLoader
 from layers import disp_to_depth
 from utils import readlines
 from options import MonodepthOptions
-import datasets
+from datasets.kitti_dataset import *
+from datasets.kaist_dataset import KAIST_Dataset
 import networks
 
 cv2.setNumThreads(0)  # This speeds up evaluation 5x on our unix systems (OpenCV 3.3.1)
@@ -74,15 +76,58 @@ def evaluate(opt):
 
         print("-> Loading weights from {}".format(opt.load_weights_folder))
 
-        filenames = readlines(os.path.join(splits_dir, opt.eval_split, "test_files.txt"))
+        thermal = False
+        if opt.dataset == 'kitti':
+            filenames = readlines(os.path.join(splits_dir, opt.eval_split, "test_files.txt"))
+        elif opt.dataset == 'KAIST':
+            val_files = os.path.join(opt.data_path, 'testing')
+            filenames = []
+
+            campus_val = os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))
+            campus_val.sort()
+            residential_val = os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))
+            residential_val.sort()
+            urban_val = os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))
+            urban_val.sort()
+
+            filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') +
+                                 file for file in campus_val)
+            filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') +
+                                 file for file in residential_val)
+            filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') +
+                                 file for file in urban_val)
+
+            gt_files = []
+            campus_gt = os.listdir(os.path.join(val_files, 'Campus/DEPTH/'))
+            campus_gt.sort()
+            residential_gt = os.listdir(os.path.join(val_files, 'Residential/DEPTH/'))
+            residential_gt.sort()
+            urban_gt = os.listdir(os.path.join(val_files, 'Urban/DEPTH/'))
+            urban_gt.sort()
+
+            gt_files.extend(os.path.join(val_files, 'Campus/DEPTH/') +
+                             file for file in campus_gt)
+            gt_files.extend(os.path.join(val_files, 'Residential/DEPTH/') +
+                             file for file in residential_gt)
+            gt_files.extend(os.path.join(val_files, 'Urban/DEPTH/') +
+                             file for file in urban_gt)
+            thermal = True
+        else:
+            assert "Please choose either kitti or KAIST datasets for depth evaluation"
+            quit()
+
+
         encoder_path = os.path.join(opt.load_weights_folder, "encoder.pth")
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
 
         encoder_dict = torch.load(encoder_path)
 
-        dataset = datasets.KITTIRAWDataset(opt.data_path, filenames,
+        datasets_dict = {'kitti': KITTIRAWDataset,
+                         'KAIST': KAIST_Dataset}
+
+        dataset = datasets_dict[opt.dataset](opt.data_path, filenames,
                                            encoder_dict['height'], encoder_dict['width'],
-                                           [0], 4, is_train=False, img_ext=opt.img_ext, thermal=False)
+                                           [0], 4, is_train=False, img_ext=opt.img_ext, thermal=thermal)
         dataloader = DataLoader(dataset, 16, shuffle=False, num_workers=opt.num_workers,
                                 pin_memory=True, drop_last=False)
 
@@ -162,8 +207,11 @@ def evaluate(opt):
         print("-> No ground truth is available for the KITTI benchmark, so not evaluating. Done.")
         quit()
 
-    gt_path = os.path.join(splits_dir, opt.eval_split, "gt_depths.npz")
-    gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1')["data"]
+    if opt.dataset == 'kitti':
+        gt_path = os.path.join(splits_dir, opt.eval_split, "gt_depths.npz")
+        gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1')["data"]
+    else:
+        gt_depths = np.stack([loadmat(path)['depth'] for path in os.listdir(gt_files)])
 
     print("-> Evaluating")
 
