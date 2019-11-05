@@ -134,7 +134,7 @@ def get_filenames(dataset, data_path, split):
                              file for file in val_files[1:-1])
         thermal = True
     elif dataset == 'KAIST':
-        train_files = os.path.join(data_path, 'training')
+        train_files = os.path.join(data_path, 'training/')
 
         campus_train = os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))
         campus_train.sort()
@@ -150,7 +150,7 @@ def get_filenames(dataset, data_path, split):
         train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') +
                                file for file in urban_train[1:-1])
 
-        val_files = os.path.join(data_path, 'testing')
+        val_files = os.path.join(data_path, 'testing/')
 
         campus_val = os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))
         campus_val.sort()
@@ -167,7 +167,7 @@ def get_filenames(dataset, data_path, split):
                              file for file in urban_val[1:-1])
         thermal = True
     elif dataset == 'CREOL':
-        train_path = os.path.join(data_path, 'training')
+        train_path = os.path.join(data_path, 'training/')
         train_sequences = os.listdir(train_path)
 
         for sequence in train_sequences:
@@ -175,7 +175,7 @@ def get_filenames(dataset, data_path, split):
             sequence_files.sort()
             train_filenames.extend(os.path.join(train_path, sequence, file) for file in sequence_files[1:-1])
 
-        val_path = os.path.join(data_path, 'testing')
+        val_path = os.path.join(data_path, 'testing/')
         val_sequences = os.listdir(val_path)
 
         for sequence in val_sequences:
