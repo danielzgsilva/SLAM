@@ -161,6 +161,9 @@ class Trainer:
             for i, dataset in enumerate(self.dataset):
                 train_filenames, val_filenames, thermal = get_filenames(dataset, data_paths[i], self.opt.split)
 
+                print('train: ' + data_paths[i] + ' - ' + len(train_filenames))
+                print('val: ' + data_paths[i] + ' - ' + len(val_filenames))
+                print(thermal)
                 num_train_samples += len(train_filenames)
                 num_val_samples += len(val_filenames)
 
