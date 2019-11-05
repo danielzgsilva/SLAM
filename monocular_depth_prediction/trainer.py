@@ -152,7 +152,7 @@ class Trainer:
             self.val_iter = iter(self.val_loader)
         else:
             datasets = ['FLIR', 'KAIST', 'CREOL']
-            data_paths = ['/groups/mshah/data/FLIR/pre_dat/', '/groups/mshah/data/KAIST_multispectral/', '~/SLAM/robert_video/']
+            data_paths = ['/groups/mshah/data/FLIR/pre_dat/', '/groups/mshah/data/KAIST_multispectral/', '../robert_video/']
 
             train_datasets = []
             val_datasets = []
