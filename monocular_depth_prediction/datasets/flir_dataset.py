@@ -40,4 +40,5 @@ class FlirDataset(MonoDataset):
             image_path = os.path.join(path, "FLIR_{}".format(f_str))
         else:
             image_path = os.path.join(path, "FLIR_video_{}".format(f_str))
+
         return image_path

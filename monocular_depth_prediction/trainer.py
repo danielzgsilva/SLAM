@@ -12,7 +12,7 @@ import time
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 #from tensorboardX import SummaryWriter
 #from torch.utils.tensorboard import SummaryWriter
 
@@ -25,6 +25,8 @@ from layers import *
 from datasets.kitti_dataset import *
 from datasets.flir_dataset import FlirDataset
 from datasets.kaist_dataset import KAIST_Dataset
+from datasets.creol_dataset import CreolDataset
+
 import networks
 
 
@@ -109,94 +111,78 @@ class Trainer:
         print("Models and tensorboard events files are saved to:\n  ", self.opt.log_dir)
         print("Training is using:\n  ", self.device)
 
-        # data
+        # dataset options
         datasets_dict = {'kitti': KITTIRAWDataset,
                          'kitti_odom': KITTIOdomDataset,
                          'FLIR': FlirDataset,
-                         'KAIST': KAIST_Dataset}
-        
-        self.dataset = datasets_dict[self.opt.dataset]
-        
-        thermal = False
-        if self.opt.dataset == 'FLIR':
-            train_filenames = []
+                         'KAIST': KAIST_Dataset,
+                         'CREOL': CreolDataset,
+                         'all_thermal_data': [FlirDataset, KAIST_Dataset, CreolDataset]}
 
-            train_files = os.listdir(os.path.join(self.opt.data_path, 'train/PreviewData/'))
-            train_files.sort()
-            train_filenames.extend(os.path.join(self.opt.data_path, 'train/PreviewData/') + 
-                                   file for file in train_files[1:-1])
+        assert (self.opt.img_ext == '.png') or (self.opt.img_ext == '.jpg') or (
+                    self.opt.img_ext == '.jpeg'), "Please provide a correct image extension"
 
-            video_files = os.listdir(os.path.join(self.opt.data_path, 'video/PreviewData/'))
-            video_files.sort()
-            train_filenames.extend(os.path.join(self.opt.data_path, 'video/PreviewData/') + 
-                                   file for file in video_files[1:-1])
-
-            val_filenames = []
-            val_files = os.listdir(os.path.join(self.opt.data_path, 'valid/PreviewData/'))
-            val_files.sort()
-            val_filenames.extend(os.path.join(self.opt.data_path, 'valid/PreviewData/') + 
-                                   file for file in val_files[1:-1])
-            thermal = True 
-        elif self.opt.dataset == 'KAIST':
-            train_files = os.path.join(self.opt.data_path, 'training')
-            train_filenames = []
-
-            campus_train = os.listdir(os.path.join(train_files, 'Campus/THERMAL/'))
-            campus_train.sort()
-            residential_train = os.listdir(os.path.join(train_files, 'Residential/THERMAL/'))
-            residential_train.sort()
-            urban_train = os.listdir(os.path.join(train_files, 'Urban/THERMAL/'))
-            urban_train.sort()
-
-            train_filenames.extend(os.path.join(train_files, 'Campus/THERMAL/') +
-                                   file for file in campus_train[1:-1])
-            train_filenames.extend(os.path.join(train_files, 'Residential/THERMAL/') +
-                                   file for file in residential_train[1:-1])
-            train_filenames.extend(os.path.join(train_files, 'Urban/THERMAL/') + 
-                                   file for file in urban_train[1:-1])
-            
-            val_files = os.path.join(self.opt.data_path, 'testing')
-            val_filenames = []
-
-            campus_val = os.listdir(os.path.join(val_files, 'Campus/THERMAL/'))
-            campus_val.sort()
-            residential_val = os.listdir(os.path.join(val_files, 'Residential/THERMAL/'))
-            residential_val.sort()
-            urban_val = os.listdir(os.path.join(val_files, 'Urban/THERMAL/'))
-            urban_val.sort()
-
-            val_filenames.extend(os.path.join(val_files, 'Campus/THERMAL/') + 
-                                   file for file in campus_val[1:-1])
-            val_filenames.extend(os.path.join(val_files, 'Residential/THERMAL/') + 
-                                   file for file in residential_val[1:-1])
-            val_filenames.extend(os.path.join(val_files, 'Urban/THERMAL/') + 
-                                   file for file in urban_val[1:-1])
-            thermal = True
-        else:
-            fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
-            train_filenames = readlines(fpath.format("train"))
-            val_filenames = readlines(fpath.format("val"))
-            
-        assert (self.opt.img_ext == '.png') or (self.opt.img_ext == '.jpg') or (self.opt.img_ext == '.jpeg'), "Please provide a correct image extension"
-        
         img_ext = self.opt.img_ext
 
-        num_train_samples = len(train_filenames)
-        self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
+        self.dataset = datasets_dict[self.opt.dataset]
 
-        train_dataset = self.dataset(
-            self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
-            self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, thermal=thermal)
-        self.train_loader = DataLoader(
-            train_dataset, self.opt.batch_size, True,
-            num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
-        val_dataset = self.dataset(
-            self.opt.data_path, val_filenames, self.opt.height, self.opt.width,
-            self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, thermal = thermal)
-        self.val_loader = DataLoader(
-            val_dataset, self.opt.batch_size, True,
-            num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
-        self.val_iter = iter(self.val_loader)
+        if self.opt.dataset != 'all_thermal_data':
+            train_filenames, val_filenames, thermal = get_filenames(self.opt.dataset, self.opt.data_path, self.opt.split)
+
+            num_train_samples = len(train_filenames)
+            num_val_samples = len(val_filenames)
+            self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
+
+            train_dataset = self.dataset(
+                self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, thermal=thermal)
+
+            self.train_loader = DataLoader(
+                train_dataset, self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+
+            val_dataset = self.dataset(
+                self.opt.data_path, val_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, thermal = thermal)
+
+            self.val_loader = DataLoader(
+                val_dataset, self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+
+            self.val_iter = iter(self.val_loader)
+        else:
+            train_datasets = []
+            val_datasets = []
+            data_paths = ['/groups/mshah/data/FLIR/', '/groups/mshah/data/KAIST_multispectral/', '~/SLAM/robert_video']
+
+            num_train_samples = 0
+            num_val_samples = 0
+
+            for i, dataset in enumerate(self.dataset):
+                train_filenames, val_filenames, thermal = get_filenames(dataset, data_paths[i], self.opt.split)
+
+                num_train_samples += len(train_filenames)
+                num_val_samples += len(val_filenames)
+
+                train_datasets.append(dataset(
+                    data_paths[i], train_filenames, self.opt.height, self.opt.width,
+                    self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, thermal=thermal))
+
+                val_datasets.append(dataset(
+                    data_paths[i], val_filenames, self.opt.height, self.opt.width,
+                    self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, thermal=thermal))
+
+            self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
+
+            self.train_loader = DataLoader(
+                ConcatDataset(train_datasets), self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+
+            self.val_loader = DataLoader(
+                ConcatDataset(val_datasets), self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+
+            self.val_iter = iter(self.val_loader)
 
        # self.writers = {}
        # for mode in ["train", "val"]:
@@ -227,7 +213,7 @@ class Trainer:
             print("Using dataset:\n  ", self.opt.dataset)
         
         print("There are {:d} training items and {:d} validation items\n".format(
-            len(train_dataset), len(val_dataset)))
+            len(num_train_samples), len(num_val_samples)))
 
         self.save_opts()
 

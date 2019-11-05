@@ -29,6 +29,7 @@ class KAIST_Dataset(MonoDataset):
         path = line.split('/')[:-1]
         path = '/'.join(path)
         image_path = os.path.join(path, "THER_{}".format(f_str))
+
         return image_path
     
     def check_depth(self):
