@@ -45,7 +45,7 @@ class MonodepthOptions:
                                  type=str,
                                  help="dataset to train on",
                                  default="kitti",
-                                 choices=["kitti", "kitti_odom", "kitti_depth", "kitti_test", 'FLIR', 'KAIST', 'CREOL'])
+                                 choices=["kitti", "kitti_odom", "kitti_depth", "kitti_test", 'FLIR', 'KAIST', 'CREOL', 'all_thermal_data'])
         self.parser.add_argument("--img_ext",
                                  help="image extension to anticipate",
                                  type=str,
