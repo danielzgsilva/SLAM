@@ -213,7 +213,7 @@ class Trainer:
             print("Using dataset:\n  ", self.opt.dataset)
         
         print("There are {:d} training items and {:d} validation items\n".format(
-            len(num_train_samples), len(num_val_samples)))
+            num_train_samples, num_val_samples))
 
         self.save_opts()
 
