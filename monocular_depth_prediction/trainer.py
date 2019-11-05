@@ -151,19 +151,22 @@ class Trainer:
 
             self.val_iter = iter(self.val_loader)
         else:
+            datasets = ['FLIR', 'KAIST', 'CREOL']
+            data_paths = ['/groups/mshah/data/FLIR/', '/groups/mshah/data/KAIST_multispectral/', '~/SLAM/robert_video']
+
             train_datasets = []
             val_datasets = []
-            data_paths = ['/groups/mshah/data/FLIR/', '/groups/mshah/data/KAIST_multispectral/', '~/SLAM/robert_video']
 
             num_train_samples = 0
             num_val_samples = 0
 
             for i, dataset in enumerate(self.dataset):
-                train_filenames, val_filenames, thermal = get_filenames(dataset, data_paths[i], self.opt.split)
+                train_filenames, val_filenames, thermal = get_filenames(datasets[i], data_paths[i], self.opt.split)
 
-                print('train: ' + data_paths[i] + ' - ' + len(train_filenames))
-                print('val: ' + data_paths[i] + ' - ' + len(val_filenames))
-                print(thermal)
+                print(datasets[i] + ' train: ' + data_paths[i] + ' - ' + len(train_filenames))
+                print(datasets[i] + ' val: ' + data_paths[i] + ' - ' + len(val_filenames))
+                print('thermal: ' + str(thermal))
+
                 num_train_samples += len(train_filenames)
                 num_val_samples += len(val_filenames)
 
