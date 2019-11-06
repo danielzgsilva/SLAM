@@ -165,7 +165,6 @@ class Trainer:
 
                 print(datasets[i] + ' train: ' + data_paths[i] + ' - ' + str(len(train_filenames)))
                 print(datasets[i] + ' val: ' + data_paths[i] + ' - ' + str(len(val_filenames)))
-                print('thermal: ' + str(thermal))
 
                 num_train_samples += len(train_filenames)
                 num_val_samples += len(val_filenames)
