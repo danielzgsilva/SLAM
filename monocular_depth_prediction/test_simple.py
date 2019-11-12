@@ -16,6 +16,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import cv2
+import re
 
 import torch
 from torchvision import transforms, datasets
@@ -161,11 +162,19 @@ def test_simple(args):
     
     # Create videos if folder
     if os.path.isdir(args.image_path):
-       
+        
         print('-> Building the original video from the inputted images')
+        
+        # Sorting files
+        files = [file for file in os.listdir(args.image_path) if os.path.isfile(os.path.join(args.image_path, file))]
+        nums = [int(re.findall('\d+', s)[0]) for s in files] 
+        dictionary = dict(zip(nums, files))
+        sorted_keys = sorted(dictionary)
+        sorted_dict = {i: dictionary[i] for i in sorted_keys}
+        files = sorted_dict.values()
 
         orig_imgs = []
-        for file in os.listdir(args.image_path):
+        for file in files:
             if not file.endswith('.{}'.format(args.ext)):
                     continue
             temp = cv2.imread(os.path.join(args.image_path, file))
@@ -182,11 +191,19 @@ def test_simple(args):
         orig_video.release()
 
         print('-> Building the depth video')
+        
+        # Sorting files
+        outputs = [file for file in os.listdir(output_directory) if file.endswith('jpg')]
+        nums = [int(re.findall('\d+', s)[0]) for s in outputs] 
+        dictionary = dict(zip(nums, outputs))
+        sorted_keys = sorted(dictionary)
+        sorted_dict = {i: dictionary[i] for i in sorted_keys}
+        outputs = sorted_dict.values()
 
         depth_imgs = []
-        for file in os.listdir(output_directory):
+        for file in outputs:
             if file.endswith("_disp.npy"):
-                    continue
+                continue
             temp_depth = cv2.imread(os.path.join(output_directory, file))
             depth_imgs.append(temp_depth)
 
