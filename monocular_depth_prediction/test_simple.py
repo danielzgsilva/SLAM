@@ -45,7 +45,8 @@ def parse_args():
                             "stereo_1024x320",
                             "mono+stereo_1024x320",
                             "flir_and_kaist_finetuned",
-                            "further_finetuned"])
+                            "further_finetuned",
+                            "rob_weights"])
 
     parser.add_argument('--ext', type=str,
                         help='image extension to search for in folder', default="jpg")
