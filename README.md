@@ -1,9 +1,9 @@
 # SLAM
-Semantic localization and mapping (SLAM), monocular depth prediction and odometry techniques for combat vehicles and LWIR using deep CNNs.
+Self-supervised learning for long-wave infrared monocular depth estimation and vehicle ego-motion prediction.
 
 Sponsored by UCF's Center for Research in Computer Vision and UCF’s Optics and Photonics Lab (CREOL)
 
-This work builds upon and extends the methods described here:
+This work leverages and extends the methods described here:
 
 > **Digging into Self-Supervised Monocular Depth Prediction**
 >
